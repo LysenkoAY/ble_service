@@ -179,7 +179,10 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('PeriodicTask '),
-                CupertinoSwitch(value: periodicTask, onChanged: (value) => setState(() => periodicTask = value)),
+                CupertinoSwitch(
+                  value: periodicTask,
+                  onChanged: (value) => setState(() => periodicTask = value),
+                ),
               ],
             ),
             const SizedBox(height: 16),
