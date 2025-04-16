@@ -33,7 +33,10 @@ Future<void> setupFlutterNotifications() async {
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
-  isFlutterLocalNotificationsInitialized = true;
+  flutterLocalNotificationsPlugin.initialize(initializationSettings).then((value) {
+    isFlutterLocalNotificationsInitialized = value!;
+  });
+
 }
 
 Future<void> showNotifications() async {
@@ -54,37 +57,9 @@ Future<void> showNotifications() async {
 
 @pragma('vm:entry-point')
 Future<void> callbackDispatcher() async {
-  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-
-  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  Future<void> showNotifications() async {
-    flutterLocalNotificationsPlugin.show(
-      124124,
-      'notification.title',
-      'notification.body',
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'channel.id',
-          'channel.name',
-          styleInformation: BigTextStyleInformation(
-            '''
-            <!DOCTYPE html>
-            <html>
-            <body>
-            <h1>My First Heading</h1>
-            <p>My first paragraph.</p>
-            </body>
-            </html>
-          ''',
-            htmlFormatBigText: true,
-          ),
-        ),
-      ),
-    );
-  }
 
   Workmanager().executeTask((task, inputData) async {
+    await setupFlutterNotifications();
     await showNotifications();
 
     print(task);
@@ -99,9 +74,6 @@ Future<void> callbackDispatcher() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupFlutterNotifications();
-  flutterLocalNotificationsPlugin.initialize(initializationSettings).then((value) {
-    print(value);
-  });
 
   Workmanager().initialize(
     callbackDispatcher,
