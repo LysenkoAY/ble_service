@@ -43,7 +43,7 @@ Future<void> showNotifications() async {
   flutterLocalNotificationsPlugin.show(
     124124,
     'notification.title',
-    'notification.body',
+    DateTime.now().toString(),
     NotificationDetails(
       android: AndroidNotificationDetails(
         channel.id,
@@ -59,7 +59,19 @@ Future<void> showNotifications() async {
 Future<void> callbackDispatcher() async {
 
   Workmanager().executeTask((task, inputData) async {
-    await setupFlutterNotifications();
+    channel = const AndroidNotificationChannel(
+      'high_importance_channel',
+      'High Importance Notifications',
+      description: 'This channel is used for important notifications.',
+      importance: Importance.high,
+    );
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings).then((value) {
+      isFlutterLocalNotificationsInitialized = value!;
+    });
     await showNotifications();
 
     print(task);
